@@ -48,7 +48,8 @@ public class WorldPanel extends JPanel implements MouseListener, ActionListener 
 		for (int i = 0; i < cells.length; i++) {
 			for (int j = 0; j < cells[i].length; j++) {
 				Random rand = new Random();
-				rand.nextBoolean();
+				
+				cells[i][j].isAlive = rand.nextBoolean();
 				
 			}
 		}
@@ -80,7 +81,11 @@ public class WorldPanel extends JPanel implements MouseListener, ActionListener 
 	@Override
 	public void paintComponent(Graphics g) {
 		//6. Iterate through the cells and draw them all
-		
+		for (int i = 0; i < cells.length; i++) {
+			for (int j = 0; j < cells[i].length; j++) {
+				cells[i][j].draw(g);
+			}
+		}
 		
 		
 		// draws grid
@@ -94,10 +99,19 @@ public class WorldPanel extends JPanel implements MouseListener, ActionListener 
 		// . using the getLivingNeighbors method.
 		int[][] livingNeighbors = new int[cellsPerRow][cellsPerRow];
 		
+		for (int i = 0; i < cells.length; i++) {
+			for (int j = 0; j < cells[i].length; j++) {
+				livingNeighbors[i][j] = getLivingNeighbors(i, j);
+			}
+		}
+		
+		
 		//8. check if each cell should live or die
-	
-		
-		
+		for (int i = 0; i < cells.length; i++) {
+			for (int j = 0; j < cells[i].length; j++) {
+			cells[i][j].liveOrDie(livingNeighbors[i][j]);
+			}
+		}
 		
 		repaint();
 	}
@@ -107,7 +121,21 @@ public class WorldPanel extends JPanel implements MouseListener, ActionListener 
 	//   living neighbors there are of the 
 	//   cell identified by x and y
 	public int getLivingNeighbors(int x, int y){
-		return 0;
+		int neighbors = 0;
+		
+		for (int i = x-1; i <= x+1; i++) {
+			for (int j = y-1; j <= y+1; j++) {
+				if (i >= 0 && j >= 0 && i <= cells.length-1 && j <= cells[i].length-1) {
+					if (cells[i][j].isAlive == true && i != x+i && j != y+j) {
+					neighbors++;
+				}
+				}
+				
+			}
+		}
+		
+		
+		return neighbors;
 	}
 
 	@Override
@@ -132,9 +160,7 @@ public class WorldPanel extends JPanel implements MouseListener, ActionListener 
 		//10. Use e.getX() and e.getY() to determine
 		//    which cell is clicked. Then toggle
 		//    the isAlive variable for that cell.
-		
-		
-		
+		cells[e.getX()/cellSize][e.getY()/cellSize].isAlive = true;
 		
 		repaint();
 	}
